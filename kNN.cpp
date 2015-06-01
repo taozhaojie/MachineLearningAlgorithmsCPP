@@ -11,10 +11,10 @@ using namespace std;
 class kNN {
 
 private:
-	std::map<std::vector<double>, int> dataSet;
-	std::map<double, std::vector<int>> dis;
-	std::vector<int> neighbours;
-	std::set<int> types;
+	std::map<std::vector<double>, int> dataSet; // the training dataset
+	std::map<double, std::vector<int>> dis; // distance, types
+	std::vector<int> neighbours; // type of k neighbours
+	std::set<int> types; // all types
 
 public:
 	void createDataSet()
@@ -69,6 +69,7 @@ public:
 			}
 		}
 
+		// count the occurrence of each type in the k neighbours
 		std::map<int, int> temp;
 		for(int type : types)
 		{
