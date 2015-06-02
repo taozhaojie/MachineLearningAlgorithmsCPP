@@ -7,7 +7,7 @@
 #include <set>
 #include "math.h"
 #include <Eigen/Dense>
-//#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -53,7 +53,7 @@ public:
 		while (!in.eof()) {
 			getline(in, tmp, '\n');
 			if (tmp == "") break;
-			vec_str = split(tmp, '\t');
+			boost::split(vec_str,tmp,boost::is_any_of("\t"));
 			for(std::vector<string>::iterator it = vec_str.begin();
 				it != vec_str.end(); ++it)
 			{
@@ -154,35 +154,6 @@ public:
 		}
 
 		return temp.rbegin()->second;
-	}
-
-	vector<string> split(const string &s, char c) 
-	{
-		vector<string> v;
-		int i = 0;
-		int j = s.find(c);
-
-		while (j >= 0) {
-			v.push_back(s.substr(i, j - i));
-			i = ++j;
-			j = s.find(c, j);
-
-			if (j < 0) {
-				v.push_back(s.substr(i, s.length()));
-			}
-		}
-		return v;
-	}
-
-	string join(vector<string> &arr, string s)
-	{
-		string result = "";
-		for (string v : arr)
-		{
-			result = result + v + s;
-		}
-		result = result.substr(0, result.size() - 1);
-		return result;
 	}
 
 	void showPrivate() // use when debug
