@@ -17,10 +17,9 @@ private:
 	Eigen::MatrixXf dataMat; // the matrix of dataset
 	int nrow; // matrix row number
 	int ncol; // matrix column number
-
-public:
 	int idx_label; // index of the column contains tables
 
+public:
 	// create sample dataset
 	void createDataSet()
 	{
@@ -34,16 +33,17 @@ public:
 		dataMat(4,0) = 0; dataMat(4,1) = 1; dataMat(4,2) = 0;
 		nrow = dataMat.rows();
 		ncol = dataMat.cols();
+		idx_label = 2;
 	}
 
-	double calcShannonEnt(Eigen::MatrixXf &mat)
+	double calcShannonEnt(Eigen::MatrixXf &mat, int idx)
 	{
 		int numEntries = mat.rows();
 		std::map<int,int> labelCounts;
 		for (int i = 0; i < numEntries; ++i)
 		{
 			Eigen::VectorXf featVec = mat.row(i);
-			int currentLabel = (int)featVec(mat.cols()-1);
+			int currentLabel = (int)featVec(idx);
 			if (labelCounts.find(currentLabel) == labelCounts.end())
 				labelCounts[currentLabel] = 1;
 			else
@@ -89,7 +89,7 @@ public:
 	int chooseBestFeatureToSplit()
 	{
 		int numFeatures = ncol - 1;
-		double baseEntropy = calcShannonEnt(dataMat);
+		double baseEntropy = calcShannonEnt(dataMat, idx_label);
 		double bestInfoGain = 0.0;
 		int bestFeature = -1;
 		for (int i = 0; i < numFeatures; ++i)
@@ -106,7 +106,7 @@ public:
 			{
 				Eigen::MatrixXf subDataSet = splitDataSet(i, value);
 				double prob = subDataSet.rows() / (double)nrow;
-				newEntropy += prob * calcShannonEnt(subDataSet);
+				newEntropy += prob * calcShannonEnt(subDataSet, idx_label-1);
 			}
 			double infoGain = baseEntropy - newEntropy;
 			if (infoGain > bestInfoGain)
@@ -124,8 +124,6 @@ int main()
 {
 	DecisionTree trees;
 	trees.createDataSet();
-	trees.idx_label = 2;
-
 
 	//cout << trees.splitDataSet(0,0) << endl;
 	
