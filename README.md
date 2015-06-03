@@ -1,5 +1,6 @@
 # MachineLearningAlgorithmsCPP
 Translate python code in the book "Machine Learning in Action" to C++
+* Use Eigen library to process matrix.
 
 ## k-NN
 1. Use Eigen library to process matrix. 
