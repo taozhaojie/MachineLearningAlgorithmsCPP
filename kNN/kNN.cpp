@@ -172,12 +172,35 @@ public:
 		}
 	}
 
-	void showPrivate() // use when debug
+	void datingClassTest()
 	{
-		
-		cout << dataMat << endl;
-		cout << dataMat.rows() << endl;
-		cout << dataMat.cols() << endl;
+		double hoRatio = 0.10;
+		file2matrix("datingTestSet2.txt"); // readin the matrix
+		idx_label = 3;	
+		autoNorm(); // normalize the matrix
+
+		int testingSize = hoRatio * nrow;
+		int trainingSize = nrow - testingSize;
+		Eigen::MatrixXf trainingSet = dataMat.block(0,0,trainingSize,ncol);
+		Eigen::MatrixXf testingSet = dataMat.block(trainingSize,0,testingSize,ncol);
+		dataMat.resize(0,0);
+		dataMat = trainingSet; // pass the training set to dataMat
+
+		int err_count = 0;
+		for(int i = 0; i < testingSize; ++i)
+		{
+			Eigen::VectorXf v1 = testingSet.row(i);
+			std::vector<double> vec(v1.data(), v1.data() + v1.size());
+			int label = vec[idx_label];
+			vec.erase(vec.begin() + idx_label);
+
+			int result = classify0(vec, 3);
+			cout << "the classifier came back with: " << result << ", the real answer is: " << label << endl;
+			if (result != label)
+				err_count ++;
+		}
+		double err_rate = err_count / (double)testingSize;
+		cout << "the total error rate is " << err_rate << endl;
 	}
 
 };
@@ -185,16 +208,7 @@ public:
 int main()
 {
 	kNN ins;
-	//ins.createDataSet();
-	ins.file2matrix("datingTestSet2.txt");
-	ins.idx_label = 3;
-	ins.autoNorm();
-	
-	ins.showPrivate();
-	//std::vector<double> test_vec = {68846, 9.97472, 0.669787};
-	//int result = ins.classify0(test_vec, 1);
-	
-	//cout << result << endl;
+	ins.datingClassTest();
 
 	return 0;
 }
