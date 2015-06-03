@@ -5,7 +5,8 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "math.h"
+#include <cmath>
+#include <cstddef>
 #include <Eigen/Dense>
 #include <boost/algorithm/string.hpp>
 
@@ -15,28 +16,29 @@ class kNN {
 
 private:
 	Eigen::MatrixXf dataMat; // the matrix of dataset
-	std::map<double, std::vector<int>> dis; // distance, types
-	std::vector<int> neighbours; // type of k neighbours
+	int nrow; // matrix row number
+	int ncol; // matrix column number
+
 	std::set<int> types; // all types
 
 public:
+	// index of the column contains tables
+	int idx_label;
+	
 	// create sample dataset
 	void createDataSet()
 	{
+		dataMat.resize(0,0);
 		dataMat.resize(4,3);
-
 		dataMat(0,0) = 1.0;
 		dataMat(0,1) = 1.1;
 		dataMat(0,2) = 0;
-
 		dataMat(1,0) = 1.0;
 		dataMat(1,1) = 1.0;
 		dataMat(1,2) = 0;
-
 		dataMat(2,0) = 0;
 		dataMat(2,1) = 0;
 		dataMat(2,2) = 1;
-
 		dataMat(3,0) = 0;
 		dataMat(3,1) = 0.1;
 		dataMat(3,2) = 1;
@@ -64,11 +66,11 @@ public:
 			vec_f.clear();
 			vec_str.clear();
 		}
-		int nrow = vec_all.size(); // to know the matrix size
-		int ncol = vec_all[0].size();
-		cout << nrow << ncol << endl;
+		nrow = vec_all.size(); // to know the matrix size
+		ncol = vec_all[0].size();
+		
+		dataMat.resize(0,0);
 		dataMat.resize(nrow,ncol);
-
 		for(int i = 0; i < nrow; ++i)
 		{
 			for(int j = 0; j < ncol; ++j)
@@ -79,7 +81,7 @@ public:
 	}
 
 	// convert Eigen::Matrix to std::map
-	std::map<std::vector<double>, int> mat2map(int idx_label)
+	std::map<std::vector<double>, int> mat2map()
 	{
 		std::map<std::vector<double>, int> dataSet;
 		int mat_size = dataMat.rows();
@@ -108,7 +110,7 @@ public:
 		else
 		{
 			double sum = 0;
-			for(unsigned int i = 0; i != v1.size(); i++)
+			for(std::size_t i = 0; i != v1.size(); i++)
 			{
 				sum += pow((v1[i] - v2[i]), 2);
 			}
@@ -117,10 +119,13 @@ public:
 	}
 
 	// classifier
-	int classify0(std::vector<double>& inX, unsigned int k, int idx_label)
+	int classify0(std::vector<double>& inX, std::size_t k)
 	{
-		// convert matrix to container map
-		std::map<std::vector<double>, int> dataSet = mat2map(idx_label);
+		std::map<double, std::vector<int>> dis; // distance, types
+		std::vector<int> neighbours; // type of k neighbours
+
+		// convert matrix to map container
+		std::map<std::vector<double>, int> dataSet = mat2map();
 
 		// calculate distance, map the distance to the class
 		// use vector for class, in case same distances
@@ -156,6 +161,17 @@ public:
 		return temp.rbegin()->second;
 	}
 
+	void autoNorm()
+	{
+		for(int i = 0; i < ncol; ++i)
+		{
+			if (i != idx_label)
+			{
+				dataMat.col(i).normalize();
+			}
+		}
+	}
+
 	void showPrivate() // use when debug
 	{
 		
@@ -169,11 +185,14 @@ public:
 int main()
 {
 	kNN ins;
-	ins.createDataSet();
-	ins.file2matrix("datingTestSet2.txt"); // tell the index of label
+	//ins.createDataSet();
+	ins.file2matrix("datingTestSet2.txt");
+	ins.idx_label = 3;
+	ins.autoNorm();
+	
 	ins.showPrivate();
-	//std::vector<double> test_vec = {0, 0};
-	//int result = ins.classify0(test_vec, 3, 2);
+	//std::vector<double> test_vec = {68846, 9.97472, 0.669787};
+	//int result = ins.classify0(test_vec, 1);
 	
 	//cout << result << endl;
 
