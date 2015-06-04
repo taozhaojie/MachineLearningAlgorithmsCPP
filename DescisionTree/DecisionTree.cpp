@@ -43,7 +43,7 @@ public:
 		for (int i = 0; i < numEntries; ++i)
 		{
 			Eigen::VectorXf featVec = mat.row(i);
-			int currentLabel = (int)featVec(idx);
+			int currentLabel = (int)featVec(idx); // the label idx
 			if (labelCounts.find(currentLabel) == labelCounts.end())
 				labelCounts[currentLabel] = 1;
 			else
@@ -118,6 +118,33 @@ public:
 		return bestFeature;
 	}
 
+	double majorityCnt(Eigen::VectorXf &classList)
+	{
+		std::map<double,int> classCounts;
+		for (int i = 0; i < classList.size(); ++i)
+		{
+			double element = classList(i);
+			if (classCounts.find(element) == classCounts.end())
+				classCounts[element] = 1;
+			else
+				classCounts[element] ++;
+		}
+		int max_cnt = 0;
+		double max_key = 0;
+		for (std::map<double, int>::iterator it = classCounts.begin();
+				it != classCounts.end(); ++it)
+		{
+			int val = it->second;
+			double key = it->first;
+			if (val > max_cnt)
+			{
+				max_cnt = val;
+				max_key = key;
+			}
+		}
+		return max_key;
+	}
+
 };
 
 int main()
@@ -128,6 +155,11 @@ int main()
 	//cout << trees.splitDataSet(0,0) << endl;
 	
 	cout << trees.chooseBestFeatureToSplit() << endl;
+
+	Eigen::VectorXf test;
+	test.resize(7);
+	test << 0,0,1,1,0,1,0;
+	cout << trees.majorityCnt(test) << endl;
 	
 	return 0;
 }
