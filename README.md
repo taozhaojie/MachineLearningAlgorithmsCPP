@@ -5,7 +5,7 @@ Translate python code in the book "Machine Learning in Action" to C++
 ## k-NN
 1. **createDataSet()**
   * Create a sample dataset.
-2. **file2matrix(filename)**
+2. **file2matrix()**
   * Read data from file.
 3. **mat2map()**
   * Convert `Eigen::MatrixXf` to `std::map<std::vector<double>, int>`.
