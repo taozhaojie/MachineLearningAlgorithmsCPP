@@ -20,3 +20,9 @@ Translate python code in the book "Machine Learning in Action" to C++
   * Evaluate the classifier.
 
 ## Decision Tree
+1. **createDataSet()**
+  * Create a sample dataset.
+2. **calcShannonEnt()**
+3. **splitDataSet()**
+4. **chooseBestFeatureToSplit()**
+5. **majorityCnt()**
