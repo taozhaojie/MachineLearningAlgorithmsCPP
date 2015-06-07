@@ -23,6 +23,7 @@ Translate python code in the book "Machine Learning in Action" to C++
 1. **createDataSet()**
   * Create a sample dataset.
 2. **calcShannonEnt()**
+  * Calculate the Shannon Entropy.
 3. **splitDataSet()**
 4. **chooseBestFeatureToSplit()**
 5. **majorityCnt()**
