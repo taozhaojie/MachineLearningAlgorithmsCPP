@@ -9,6 +9,8 @@
 #include <cstddef>
 #include <Eigen/Dense>
 #include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
+#include <boost/any.hpp>
 
 using namespace std;
 
@@ -59,14 +61,14 @@ public:
 		return shannonEnt;
 	}
 
-	Eigen::MatrixXf splitDataSet(int axis, double value)
+	Eigen::MatrixXf splitDataSet(Eigen::MatrixXf &dt, int axis, double value)
 	{
 		Eigen::MatrixXf retDataSet;
 		std::vector<vector<double>> temp;
 
 		for (int i = 0; i < nrow; ++i)
 		{
-			Eigen::VectorXf v1 = dataMat.row(i);
+			Eigen::VectorXf v1 = dt.row(i);
 			std::vector<double> featVec(v1.data(), v1.data() + v1.size());
 			if (featVec[axis] == value)
 			{
@@ -86,15 +88,15 @@ public:
 		return retDataSet;
 	}
 
-	int chooseBestFeatureToSplit()
+	int chooseBestFeatureToSplit(Eigen::MatrixXf &dt)
 	{
 		int numFeatures = ncol - 1;
-		double baseEntropy = calcShannonEnt(dataMat, idx_label);
+		double baseEntropy = calcShannonEnt(dt, idx_label);
 		double bestInfoGain = 0.0;
 		int bestFeature = -1;
 		for (int i = 0; i < numFeatures; ++i)
 		{
-			Eigen::VectorXf featList = dataMat.col(i);
+			Eigen::VectorXf featList = dt.col(i);
 			std::set<double> uniqueVals;
 			for (int j = 0; j < nrow; ++j)
 			{
@@ -104,7 +106,7 @@ public:
 
 			for (double value : uniqueVals)
 			{
-				Eigen::MatrixXf subDataSet = splitDataSet(i, value);
+				Eigen::MatrixXf subDataSet = splitDataSet(dt, i, value);
 				double prob = subDataSet.rows() / (double)nrow;
 				newEntropy += prob * calcShannonEnt(subDataSet, idx_label-1);
 			}
@@ -115,7 +117,7 @@ public:
 				bestFeature = i;
 			}
 		}
-		return bestFeature;
+		return bestFeature; // this is the index of best feature
 	}
 
 	double majorityCnt(Eigen::VectorXf &classList)
@@ -142,7 +144,51 @@ public:
 				max_key = key;
 			}
 		}
-		return max_key;
+		return max_key; // this is the class have highest freq
+	}
+
+	boost::any createTree(Eigen::MatrixXf &dt)
+	{
+		int n = dt.cols(); // no. of columns
+		Eigen::VectorXf classList = dt.col(n-1); // last column
+		for (int i = 0; i < (classList.size() - 1); ++i)
+		{
+			if (classList(i) != classList(i+1))
+				return classList(0); // double
+		}
+		if (dt.rows() == 1)
+			return majorityCnt(classList); // int
+		int bestFeat = chooseBestFeatureToSplit(dt);
+		std::map<int, boost::any> myTree;
+		Eigen::VectorXf featValues = dt.col(bestFeat);
+		std::set<double> uniqueVals;
+		for (int j = 0; j < featValues.size(); ++j)
+		{
+			uniqueVals.insert(featValues(j));
+		}
+		for (double value : uniqueVals)
+		{
+			std::map<int, boost::any> temp;
+			Eigen::MatrixXf tmp;
+			tmp = splitDataSet(dt, bestFeat, value);
+			try
+			{
+				std::map<int, boost::any> v = boost::any_cast<std::map<int, boost::any>>(createTree(tmp));
+				temp[value] = v;
+				myTree[bestFeat] = temp;
+			}
+			catch(boost::bad_any_cast& e)
+			{
+				try{ int v = boost::any_cast<int>(createTree(tmp)); return v; }
+				catch(boost::bad_any_cast& e)
+				{ 
+					double v = boost::any_cast<double>(createTree(tmp)); 
+					return v;
+				}
+			}
+			
+		}
+		return myTree;
 	}
 
 };
@@ -151,15 +197,6 @@ int main()
 {
 	DecisionTree trees;
 	trees.createDataSet();
-
-	//cout << trees.splitDataSet(0,0) << endl;
-	
-	cout << trees.chooseBestFeatureToSplit() << endl;
-
-	Eigen::VectorXf test;
-	test.resize(7);
-	test << 0,0,1,1,0,1,0;
-	cout << trees.majorityCnt(test) << endl;
 	
 	return 0;
 }
