@@ -9,7 +9,6 @@
 #include <cstddef>
 #include <Eigen/Dense>
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 #include <boost/any.hpp>
 
 using namespace std;
