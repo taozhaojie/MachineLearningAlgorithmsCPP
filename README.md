@@ -1,6 +1,7 @@
 # MachineLearningAlgorithmsCPP
 Translate python code in the book "Machine Learning in Action" to C++
 * Use Eigen library to process matrix.
+* Use boost library.
 
 ## k-NN
 1. **createDataSet()**
@@ -25,5 +26,10 @@ Translate python code in the book "Machine Learning in Action" to C++
 2. **calcShannonEnt()**
   * Calculate the Shannon Entropy.
 3. **splitDataSet()**
+  * Split the dataset.
 4. **chooseBestFeatureToSplit()**
+  * Split the dataset, and choose the feature that can have highest information gain.
 5. **majorityCnt()**
+  * Return the class with highest frequency.
+6. **createTree()**
+  * Create a decision tree, store the data in `std::map<int, boost::any>`.
