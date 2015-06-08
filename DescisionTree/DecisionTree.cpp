@@ -15,12 +15,12 @@ using namespace std;
 
 class DecisionTree {
 private:
-	Eigen::MatrixXf dataMat; // the matrix of dataset
 	int nrow; // matrix row number
 	int ncol; // matrix column number
 	int idx_label; // index of the column contains tables
 
 public:
+	Eigen::MatrixXf dataMat; // the matrix of dataset
 	// create sample dataset
 	void createDataSet()
 	{
@@ -196,6 +196,6 @@ int main()
 {
 	DecisionTree trees;
 	trees.createDataSet();
-	
+	trees.createTree(trees.dataMat);
 	return 0;
 }
