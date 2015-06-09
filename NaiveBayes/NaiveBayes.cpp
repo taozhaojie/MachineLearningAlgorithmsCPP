@@ -16,7 +16,7 @@ private:
 	
 	std::vector<std::vector<std::string>> postingList;
 	std::vector<int> classVec;
-	std::set<std::string> vocabList;
+	std::vector<std::string> vocabList;
 
 public:
 	void loadDataSet()
@@ -32,19 +32,21 @@ public:
 
 	void createVocabList()
 	{
+		std::set<std::string> vocabListSet;
 		for (std::vector<std::string> document : postingList)
 		{
 			for (std::string word : document)
-				vocabList.insert(word);
+				vocabListSet.insert(word);
 		}
+		std::copy(vocabListSet.begin(), vocabListSet.end(), std::back_inserter(vocabList));
 	}
 
-	std::vector<int> setOfWords2Vec(std::vector<std::string>> & inputSet)
+	std::vector<int> setOfWords2Vec(std::vector<std::string> & inputSet)
 	{
-		std::vector<int> returnVec(inputSet.size(), 0);
+		std::vector<int> returnVec(vocabList.size(), 0);
 		for (std::string word : inputSet)
 		{
-			int idx = std::find(vocabList.begin(), vocabList.end(), word) - vocabList.begin();
+			size_t idx = std::find(vocabList.begin(), vocabList.end(), word) - vocabList.begin();
 			if (idx == vocabList.size())
 				cout << "word: " << word << "not found" << endl;
 			else
@@ -57,7 +59,17 @@ public:
 
 int main()
 {
-	
+	NaiveBayes bayes;
+	bayes.loadDataSet();
+	bayes.createVocabList();
+
+	std::vector<std::string> testInput = {"my", "dog", "has", "flea", "problems", "help", "please"};
+	std::vector<int> testVec = bayes.setOfWords2Vec(testInput);
+
+	for (auto it = testVec.begin(); it != testVec.end(); ++it)
+	{
+		cout << *it;
+	}
 
 	return 0;
 }
