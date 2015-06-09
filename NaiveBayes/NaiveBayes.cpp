@@ -16,6 +16,7 @@ private:
 	
 	std::vector<std::vector<std::string>> postingList;
 	std::vector<int> classVec;
+	std::set<std::string> vocabList;
 
 public:
 	void loadDataSet()
@@ -27,6 +28,15 @@ public:
 					{"mr", "licks", "ate", "my", "steak", "how", "to", "stop", "him"},
 					{"quit", "buying", "worthless", "dog", "food", "stupid"}};
 		classVec = {0,1,0,1,0,1};
+	}
+
+	void createVocabList()
+	{
+		for (std::vector<std::string> document : postingList)
+		{
+			for (std::string word : document)
+				vocabList.insert(word);
+		}
 	}
 
 };
