@@ -39,6 +39,20 @@ public:
 		}
 	}
 
+	std::vector<int> setOfWords2Vec(std::vector<std::string>> & inputSet)
+	{
+		std::vector<int> returnVec(inputSet.size(), 0);
+		for (std::string word : inputSet)
+		{
+			int idx = std::find(vocabList.begin(), vocabList.end(), word) - vocabList.begin();
+			if (idx == vocabList.size())
+				cout << "word: " << word << "not found" << endl;
+			else
+				returnVec.at(idx) = 1;
+		}
+		return returnVec;
+	}
+
 };
 
 int main()
