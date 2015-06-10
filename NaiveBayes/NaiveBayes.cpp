@@ -21,8 +21,8 @@ private:
 	std::vector<std::vector<std::string>> postingList;
 	std::vector<int> classVec;
 	std::vector<std::string> vocabList;
-	std::vector<double> p1Vect;
-	std::vector<double> p0Vect;
+	Eigen::VectorXf p1Vect;
+	Eigen::VectorXf p0Vect;
 
 public:
 	void loadDataSet()
@@ -72,14 +72,31 @@ public:
 		}
 		ncol = vec[0].size();
 		nrow = vec.size();
-
 		dataMat.resize(nrow, ncol);
 		for (int i = 0; i < nrow; ++i)
 		{
 			dataMat.row(i) = vec[i];
 		}
-
-		cout << dataMat << endl;
+		std::vector<float> tmp(ncol, 1);
+		Eigen::Map<Eigen::VectorXf> p0Num(tmp.data(),ncol);
+		Eigen::Map<Eigen::VectorXf> p1Num(tmp.data(),ncol);
+		double p0Denom = 2.0;
+		double p1Denom = 2.0;
+		for (int i = 0; i < nrow; ++i)
+		{
+			if (classVec[i] == 1)
+			{
+				p1Num += dataMat.row(i);
+				p1Denom += dataMat.row(i).sum();
+			}
+			else
+			{
+				p0Num += dataMat.row(i);
+				p0Denom += dataMat.row(i).sum();
+			}
+		}
+		p1Vect = (p1Num / p1Denom).array().log();
+		p0Vect = (p0Num / p0Denom).array().log();
 	}
 
 };
