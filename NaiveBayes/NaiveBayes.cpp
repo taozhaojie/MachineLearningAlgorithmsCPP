@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstddef>
 #include <Eigen/Dense>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -65,7 +66,6 @@ public:
 
 	void trainNB0()
 	{
-		pAbusive = std::accumulate(classVec.begin(), classVec.end(), 0) / (double)nrow;
 		std::vector<Eigen::VectorXf> vec;
 		for (std::vector<std::string> document : postingList)
 		{
@@ -78,9 +78,11 @@ public:
 		{
 			dataMat.row(i) = vec[i];
 		}
+		pAbusive = std::accumulate(classVec.begin(), classVec.end(), 0) / (double)nrow;
 		std::vector<float> tmp(ncol, 1);
+		std::vector<float> tmp2(ncol, 1);
 		Eigen::Map<Eigen::VectorXf> p0Num(tmp.data(),ncol);
-		Eigen::Map<Eigen::VectorXf> p1Num(tmp.data(),ncol);
+		Eigen::Map<Eigen::VectorXf> p1Num(tmp2.data(),ncol);
 		double p0Denom = 2.0;
 		double p1Denom = 2.0;
 		for (int i = 0; i < nrow; ++i)
@@ -102,12 +104,28 @@ public:
 
 	int classifyNB(Eigen::VectorXf & vec2Classify)
 	{
-		double p1 = (vec2Classify * p1Vect).sum() + log(pAbusive);
-		double p0 = (vec2Classify * p0Vect).sum() + log(1 - pAbusive);
+		double p1 = (vec2Classify.array() * p1Vect.array()).sum() + log(pAbusive);
+		double p0 = (vec2Classify.array() * p0Vect.array()).sum() + log(1 - pAbusive);
 		if (p1 > p0)
 			return 1;
 		else
 			return 0;
+	}
+
+	void testingNB()
+	{
+		loadDataSet();
+		createVocabList();
+		trainNB0();
+		std::vector<std::string> testEntry = {"love", "my", "dalmation"};
+		Eigen::VectorXf doc = setOfWords2Vec(testEntry);
+		int classifyResult = classifyNB(doc);
+		cout << boost::algorithm::join(testEntry, ", ") << " classified as: " << classifyResult << endl;
+		testEntry.clear();
+		testEntry = {"stupid", "garbage"};
+		doc = setOfWords2Vec(testEntry);
+		classifyResult = classifyNB(doc);
+		cout << boost::algorithm::join(testEntry, ", ") << " classified as: " << classifyResult << endl;
 	}
 
 };
@@ -115,10 +133,8 @@ public:
 int main()
 {
 	NaiveBayes bayes;
-	bayes.loadDataSet();
-	bayes.createVocabList();
-
-	bayes.trainNB0();
+	
+	bayes.testingNB();
 
 	return 0;
 }
