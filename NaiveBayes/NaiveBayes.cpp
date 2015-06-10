@@ -128,13 +128,42 @@ public:
 		cout << boost::algorithm::join(testEntry, ", ") << " classified as: " << classifyResult << endl;
 	}
 
+	Eigen::VectorXf bagOfWords2VecMN(std::vector<std::string> & inputSet)
+	{
+		std::vector<float> returnVec(vocabList.size(), 0);
+		for (std::string word : inputSet)
+		{
+			size_t idx = std::find(vocabList.begin(), vocabList.end(), word) - vocabList.begin();
+			if (idx == vocabList.size())
+				cout << "word: " << word << "not found" << endl;
+			else
+				returnVec.at(idx) += 1;
+		}
+		Eigen::Map<Eigen::VectorXf> v(returnVec.data(),returnVec.size());
+		return v;
+	}
+
+	std::vector<std::string> textParse(std::string bigString)
+	{
+		std::vector<std::string> vec;
+		boost::split(vec, bigString, boost::is_any_of("\t,'.',' ',\n,',',';',':'"));
+		std::vector<std::string> vec2;
+		for (auto it = vec.begin(); it != vec.end(); ++it)
+		{
+			if (*it != " " && *it != "")
+				vec2.push_back(*it);
+		}
+		return vec2;
+	}
 };
 
 int main()
 {
 	NaiveBayes bayes;
 	
-	bayes.testingNB();
+	//bayes.testingNB();
 
+	std::string test_string = "This book is the best book on Python or M.L. I have ever laid eyes upon.";
+	bayes.textParse(test_string);
 	return 0;
 }
