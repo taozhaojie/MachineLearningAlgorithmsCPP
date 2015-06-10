@@ -23,6 +23,7 @@ private:
 	std::vector<std::string> vocabList;
 	Eigen::VectorXf p1Vect;
 	Eigen::VectorXf p0Vect;
+	double pAbusive;
 
 public:
 	void loadDataSet()
@@ -64,7 +65,7 @@ public:
 
 	void trainNB0()
 	{
-		// convert dataset to matrix
+		pAbusive = std::accumulate(classVec.begin(), classVec.end(), 0) / (double)nrow;
 		std::vector<Eigen::VectorXf> vec;
 		for (std::vector<std::string> document : postingList)
 		{
@@ -98,6 +99,8 @@ public:
 		p1Vect = (p1Num / p1Denom).array().log();
 		p0Vect = (p0Num / p0Denom).array().log();
 	}
+
+	int classifyNB()
 
 };
 

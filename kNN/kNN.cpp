@@ -21,6 +21,44 @@ private:
 
 	std::set<int> types; // all types
 
+	// convert Eigen::Matrix to std::map
+	std::map<std::vector<double>, int> mat2map()
+	{
+		std::map<std::vector<double>, int> dataSet;
+		int mat_size = dataMat.rows();
+		for(int i = 0; i != mat_size; ++i)
+		{
+			Eigen::VectorXf v1 = dataMat.row(i);
+			std::vector<double> v2(v1.data(), v1.data() + v1.size());
+
+			int type = v2[idx_label];
+			v2.erase(v2.begin() + idx_label);
+			dataSet[v2] = type;
+			v2.clear();
+		}
+		return dataSet;
+	}
+
+	// calculate euclidean distance of 2 vectors
+	double euclidean_distance(std::vector<double>& v1, std::vector<double>& v2)
+	{
+		if (v1.size() != v2.size())
+		{
+			cout << "size not equl" << endl;
+			return -1;
+		}
+
+		else
+		{
+			double sum = 0;
+			for(std::size_t i = 0; i != v1.size(); i++)
+			{
+				sum += pow((v1[i] - v2[i]), 2);
+			}
+			return sqrt(sum);
+		}
+	}
+
 public:
 	// index of the column contains tables
 	int idx_label;
@@ -77,44 +115,6 @@ public:
 			{
 				dataMat(i,j) = vec_all[i][j];
 			}
-		}
-	}
-
-	// convert Eigen::Matrix to std::map
-	std::map<std::vector<double>, int> mat2map()
-	{
-		std::map<std::vector<double>, int> dataSet;
-		int mat_size = dataMat.rows();
-		for(int i = 0; i != mat_size; ++i)
-		{
-			Eigen::VectorXf v1 = dataMat.row(i);
-			std::vector<double> v2(v1.data(), v1.data() + v1.size());
-
-			int type = v2[idx_label];
-			v2.erase(v2.begin() + idx_label);
-			dataSet[v2] = type;
-			v2.clear();
-		}
-		return dataSet;
-	}
-
-	// calculate euclidean distance of 2 vectors
-	double euclidean_distance(std::vector<double>& v1, std::vector<double>& v2)
-	{
-		if (v1.size() != v2.size())
-		{
-			cout << "size not equl" << endl;
-			return -1;
-		}
-
-		else
-		{
-			double sum = 0;
-			for(std::size_t i = 0; i != v1.size(); i++)
-			{
-				sum += pow((v1[i] - v2[i]), 2);
-			}
-			return sqrt(sum);
 		}
 	}
 
