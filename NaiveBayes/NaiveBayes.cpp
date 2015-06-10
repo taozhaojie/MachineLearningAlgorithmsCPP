@@ -100,7 +100,15 @@ public:
 		p0Vect = (p0Num / p0Denom).array().log();
 	}
 
-	int classifyNB()
+	int classifyNB(Eigen::VectorXf & vec2Classify)
+	{
+		double p1 = (vec2Classify * p1Vect).sum() + log(pAbusive);
+		double p0 = (vec2Classify * p0Vect).sum() + log(1 - pAbusive);
+		if (p1 > p0)
+			return 1;
+		else
+			return 0;
+	}
 
 };
 
