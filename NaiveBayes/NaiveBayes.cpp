@@ -7,6 +7,7 @@
 #include <set>
 #include <cmath>
 #include <cstddef>
+#include <Eigen/Dense>
 
 using namespace std;
 
@@ -14,9 +15,14 @@ class NaiveBayes {
 
 private:
 	
+	Eigen::MatrixXf dataMat;
+	int nrow; // matrix row number
+	int ncol; // matrix column number
 	std::vector<std::vector<std::string>> postingList;
 	std::vector<int> classVec;
 	std::vector<std::string> vocabList;
+	std::vector<double> p1Vect;
+	std::vector<double> p0Vect;
 
 public:
 	void loadDataSet()
@@ -41,9 +47,9 @@ public:
 		std::copy(vocabListSet.begin(), vocabListSet.end(), std::back_inserter(vocabList));
 	}
 
-	std::vector<int> setOfWords2Vec(std::vector<std::string> & inputSet)
+	Eigen::VectorXf setOfWords2Vec(std::vector<std::string> & inputSet)
 	{
-		std::vector<int> returnVec(vocabList.size(), 0);
+		std::vector<float> returnVec(vocabList.size(), 0);
 		for (std::string word : inputSet)
 		{
 			size_t idx = std::find(vocabList.begin(), vocabList.end(), word) - vocabList.begin();
@@ -52,7 +58,28 @@ public:
 			else
 				returnVec.at(idx) = 1;
 		}
-		return returnVec;
+		Eigen::Map<Eigen::VectorXf> v(returnVec.data(),returnVec.size());
+		return v;
+	}
+
+	void trainNB0()
+	{
+		// convert dataset to matrix
+		std::vector<Eigen::VectorXf> vec;
+		for (std::vector<std::string> document : postingList)
+		{
+			vec.push_back(setOfWords2Vec(document));
+		}
+		ncol = vec[0].size();
+		nrow = vec.size();
+
+		dataMat.resize(nrow, ncol);
+		for (int i = 0; i < nrow; ++i)
+		{
+			dataMat.row(i) = vec[i];
+		}
+
+		cout << dataMat << endl;
 	}
 
 };
@@ -63,13 +90,7 @@ int main()
 	bayes.loadDataSet();
 	bayes.createVocabList();
 
-	std::vector<std::string> testInput = {"my", "dog", "has", "flea", "problems", "help", "please"};
-	std::vector<int> testVec = bayes.setOfWords2Vec(testInput);
-
-	for (auto it = testVec.begin(); it != testVec.end(); ++it)
-	{
-		cout << *it;
-	}
+	bayes.trainNB0();
 
 	return 0;
 }
