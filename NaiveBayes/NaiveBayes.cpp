@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <Eigen/Dense>
 #include <boost/algorithm/string.hpp>
+#include <boost/tokenizer.hpp>
 
 using namespace std;
 
@@ -143,17 +144,15 @@ public:
 		return v;
 	}
 
-	std::vector<std::string> textParse(std::string bigString)
+	std::vector<std::string> textParse(std::string & bigString)
 	{
 		std::vector<std::string> vec;
-		boost::split(vec, bigString, boost::is_any_of("\t,'.',' ',\n,',',';',':'"));
-		std::vector<std::string> vec2;
-		for (auto it = vec.begin(); it != vec.end(); ++it)
+		boost::tokenizer<> tok(bigString);
+		for(boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); ++ beg)
 		{
-			if (*it != " " && *it != "")
-				vec2.push_back(*it);
+		    vec.push_back(*beg);
 		}
-		return vec2;
+		return vec;
 	}
 };
 
@@ -163,7 +162,16 @@ int main()
 	
 	//bayes.testingNB();
 
-	std::string test_string = "This book is the best book on Python or M.L. I have ever laid eyes upon.";
-	bayes.textParse(test_string);
+	std::ifstream in("email/ham/1.txt");
+	std::string str((std::istreambuf_iterator<char>(in)),
+	                 std::istreambuf_iterator<char>());
+
+	std::vector<std::string> v = bayes.textParse(str);
+
+	for (auto it = v.begin(); it != v.end(); ++it)
+	{
+		cout << *it << endl;
+	}
+
 	return 0;
 }
