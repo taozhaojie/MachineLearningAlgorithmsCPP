@@ -10,6 +10,7 @@
 #include <Eigen/Dense>
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
+#include <sstream>
 
 using namespace std;
 
@@ -26,6 +27,23 @@ private:
 	Eigen::VectorXf p1Vect;
 	Eigen::VectorXf p0Vect;
 	double pAbusive;
+
+	std::string readFile(std::string & filename)
+	{
+		std::ifstream in(filename);
+		std::string str((std::istreambuf_iterator<char>(in)),
+			            std::istreambuf_iterator<char>());
+		return str;
+	}
+
+	void printVec(std::vector<std::string> &v)
+	{
+		for (auto it = v.begin(); it != v.end(); ++it)
+		{
+			cout << *it << ", ";
+		}
+		cout << endl;
+	}
 
 public:
 	void loadDataSet()
@@ -157,6 +175,26 @@ public:
 
 	void spamTest()
 	{
+		for (int i = 1; i != 26; ++i)
+		{
+			std::ostringstream ss1;
+			std::ostringstream ss0;
+			ss1 << "email/spam/" << i << ".txt";
+			ss0 << "email/ham/" << i << ".txt";
+			std::string filename1 = ss1.str();
+			std::string filename0 = ss0.str();
+
+			std::string str = readFile(filename1);
+			std::vector<std::string> wordList = textParse(str);
+			postingList.push_back(wordList);
+			classVec.push_back(1);
+			str = readFile(filename0);
+			wordList = textParse(str);
+			postingList.push_back(wordList);
+			classVec.push_back(0);
+		}
+		createVocabList();
+
 		std::vector<int> trainingSet;
 		std::vector<int> testSet;
 		for (int i = 0; i != 50; ++i)
