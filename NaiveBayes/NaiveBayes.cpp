@@ -11,6 +11,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 #include <sstream>
+#include <ctime>
 
 using namespace std;
 
@@ -43,6 +44,38 @@ private:
 			cout << *it << ", ";
 		}
 		cout << endl;
+	}
+
+	void vec2mat()
+	{
+		std::vector<Eigen::VectorXf> vec;
+		for (std::vector<std::string> document : postingList)
+		{
+			vec.push_back(setOfWords2Vec(document));
+		}
+		ncol = vec[0].size();
+		nrow = vec.size();
+		dataMat.resize(nrow, ncol);
+		for (int i = 0; i < nrow; ++i)
+		{
+			dataMat.row(i) = vec[i];
+		}
+	}
+
+	void vec2mat2()
+	{
+		std::vector<Eigen::VectorXf> vec;
+		for (std::vector<std::string> document : postingList)
+		{
+			vec.push_back(bagOfWords2VecMN(document));
+		}
+		ncol = vec[0].size();
+		nrow = vec.size();
+		dataMat.resize(nrow, ncol);
+		for (int i = 0; i < nrow; ++i)
+		{
+			dataMat.row(i) = vec[i];
+		}
 	}
 
 public:
@@ -85,18 +118,6 @@ public:
 
 	void trainNB0()
 	{
-		std::vector<Eigen::VectorXf> vec;
-		for (std::vector<std::string> document : postingList)
-		{
-			vec.push_back(setOfWords2Vec(document));
-		}
-		ncol = vec[0].size();
-		nrow = vec.size();
-		dataMat.resize(nrow, ncol);
-		for (int i = 0; i < nrow; ++i)
-		{
-			dataMat.row(i) = vec[i];
-		}
 		pAbusive = std::accumulate(classVec.begin(), classVec.end(), 0) / (double)nrow;
 		std::vector<float> tmp(ncol, 1);
 		std::vector<float> tmp2(ncol, 1);
@@ -135,6 +156,7 @@ public:
 	{
 		loadDataSet();
 		createVocabList();
+		vec2mat();
 		trainNB0();
 		std::vector<std::string> testEntry = {"love", "my", "dalmation"};
 		Eigen::VectorXf doc = setOfWords2Vec(testEntry);
@@ -199,12 +221,33 @@ public:
 		std::vector<int> testSet;
 		for (int i = 0; i != 50; ++i)
 			trainingSet.push_back(i);
+		cout << trainingSet.size() << endl;
+		srand(time(0));
 		for (int i = 0; i != 10; ++i)
 		{
 			int randIndex = rand() % 50;
+			cout << i << ", " << randIndex << endl;
 			testSet.push_back(trainingSet.at(randIndex));
 			trainingSet.erase(trainingSet.begin() + randIndex);
 		}
+
+		vec2mat2();
+		trainNB0();
+
+		int errorCount = 0;
+		for (int docIndex : testSet)
+		{
+			Eigen::VectorXf wordVector = bagOfWords2VecMN(postingList.at(docIndex));
+			cout << docIndex << ": " << classifyNB(wordVector) << " " << classVec.at(docIndex) << endl;
+
+			if (classifyNB(wordVector) != classVec.at(docIndex))
+			{
+				errorCount ++;
+				cout << "classification error" << endl;
+			}
+		}
+		double err_rate = errorCount / 10.0;
+		cout << "the error rate is: " << err_rate << endl;
 	}
 };
 
