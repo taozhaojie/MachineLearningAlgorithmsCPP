@@ -33,3 +33,5 @@ Translate python code in the book "Machine Learning in Action" to C++
   * Return the class with highest frequency.
 6. **createTree()**
   * Create a decision tree, store the data in `std::map<int, boost::any>`.
+
+## Naive Bayes
