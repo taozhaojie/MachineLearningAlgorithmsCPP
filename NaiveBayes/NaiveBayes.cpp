@@ -154,6 +154,20 @@ public:
 		}
 		return vec;
 	}
+
+	void spamTest()
+	{
+		std::vector<int> trainingSet;
+		std::vector<int> testSet;
+		for (int i = 0; i != 50; ++i)
+			trainingSet.push_back(i);
+		for (int i = 0; i != 10; ++i)
+		{
+			int randIndex = rand() % 50;
+			testSet.push_back(trainingSet.at(randIndex));
+			trainingSet.erase(trainingSet.begin() + randIndex);
+		}
+	}
 };
 
 int main()
@@ -162,7 +176,7 @@ int main()
 	
 	//bayes.testingNB();
 
-	std::ifstream in("email/ham/1.txt");
+	/*std::ifstream in("email/ham/1.txt");
 	std::string str((std::istreambuf_iterator<char>(in)),
 	                 std::istreambuf_iterator<char>());
 
@@ -171,7 +185,9 @@ int main()
 	for (auto it = v.begin(); it != v.end(); ++it)
 	{
 		cout << *it << endl;
-	}
+	}*/
+
+	bayes.spamTest();
 
 	return 0;
 }
