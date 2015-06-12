@@ -221,12 +221,12 @@ public:
 		std::vector<int> testSet;
 		for (int i = 0; i != 50; ++i)
 			trainingSet.push_back(i);
-		cout << trainingSet.size() << endl;
+
 		srand(time(0));
 		for (int i = 0; i != 10; ++i)
 		{
-			int randIndex = rand() % 50;
-			cout << i << ", " << randIndex << endl;
+			unsigned int len = trainingSet.size();
+			int randIndex = rand() % len;
 			testSet.push_back(trainingSet.at(randIndex));
 			trainingSet.erase(trainingSet.begin() + randIndex);
 		}
