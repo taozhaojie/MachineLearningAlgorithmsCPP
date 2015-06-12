@@ -197,6 +197,7 @@ public:
 
 	void spamTest()
 	{
+		// readin file
 		for (int i = 1; i != 26; ++i)
 		{
 			std::ostringstream ss1;
@@ -215,8 +216,10 @@ public:
 			postingList.push_back(wordList);
 			classVec.push_back(0);
 		}
+
 		createVocabList();
 
+		// create trainingset and testset
 		std::vector<int> trainingSet;
 		std::vector<int> testSet;
 		for (int i = 0; i != 50; ++i)
@@ -234,6 +237,7 @@ public:
 		vec2mat2();
 		trainNB0();
 
+		// test
 		int errorCount = 0;
 		for (int docIndex : testSet)
 		{
