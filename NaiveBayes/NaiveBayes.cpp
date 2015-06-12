@@ -62,10 +62,16 @@ private:
 		}
 	}
 
-	void vec2mat2()
+	void vec2mat2(std::vector<int> &trainingIndex)
 	{
+		std::vector<std::vector<std::string>> temp;
+		for (int idx : trainingIndex)
+		{
+			temp.push_back(postingList.at(idx));
+		}
+
 		std::vector<Eigen::VectorXf> vec;
-		for (std::vector<std::string> document : postingList)
+		for (std::vector<std::string> document : temp)
 		{
 			vec.push_back(bagOfWords2VecMN(document));
 		}
@@ -234,7 +240,7 @@ public:
 			trainingSet.erase(trainingSet.begin() + randIndex);
 		}
 
-		vec2mat2();
+		vec2mat2(trainingSet);
 		trainNB0();
 
 		// test
