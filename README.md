@@ -35,3 +35,9 @@ Translate python code in the book "Machine Learning in Action" to C++
   * Create a decision tree, store the data in `std::map<int, boost::any>`.
 
 ## Naive Bayes
+1. **readFile()**
+  * Read in a file to string.
+2. **loadDataSet()**
+  * Create a sample dataset.
+3. **createVocabList()**
+  * Create a vocabulary list, include all words in all documents.
